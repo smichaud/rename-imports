@@ -12,3 +12,5 @@ keywords = ["import", "imports", "refactoring", "renaming"]
 
 [dependencies]
 clap = { version = "4.1.1", features = ["derive"] }
+pathdiff = "0.2.1"
+walkdir = "2.3.2"

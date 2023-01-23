@@ -1,92 +1,23 @@
 use std::error::Error;
-use std::{env, fs};
 
-pub struct Config {
-    pub query: String,
-    pub file_path: String,
-    pub ignore_case: bool,
-}
+pub mod args;
+pub mod files;
+pub mod my_error;
 
-impl Config {
-    pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
-        args.next();
-        let query = match args.next() {
-            Some(arg) => arg,
-            None => return Err("Query string missing"),
-        };
-        let file_path = match args.next() {
-            Some(arg) => arg,
-            None => return Err("File path missing"),
-        };
+pub fn run(project_root: &str, src: &str, dst: &str) -> Result<(), Box<dyn Error>> {
+    println!("{project_root}: {src} --> {dst}");
 
-        let ignore_case = env::var("IGNORE_CASE").is_ok();
+    let extension =
+        files::get_extension_from_filename(src).ok_or(my_error::MyError::new("Broken"))?;
 
-        Ok(Config {
-            query,
-            file_path,
-            ignore_case,
-        })
+    let filepaths = files::list_filepaths_with_extension(project_root, &extension);
+    for filepath in filepaths.iter() {
+        println!("{filepath}");
     }
-}
 
-pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    contents
-        .lines()
-        .filter(|line| line.contains(query))
-        .collect()
-}
-
-pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    contents
-        .lines()
-        .filter(|line| line.to_lowercase().contains(&query.to_lowercase()))
-        .collect()
-}
-
-pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(config.file_path)?;
-
-    let results = if config.ignore_case {
-        search_case_insensitive(&config.query, &contents)
-    } else {
-        search(&config.query, &contents)
-    };
-
-    for line in results {
-        println!("{line}");
-    }
+    println!("Get all filepath matching extension pattern");
+    println!("For all files");
+    println!("If matching rel path, replace and write file");
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn case_sensitive() {
-        let query = "duct";
-        let contents = "\
-Rust:
-safe, fast, productive.
-Pick three.
-Duct tape.";
-
-        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
-    }
-
-    #[test]
-    fn case_insensitive() {
-        let query = "rUsT";
-        let contents = "\
-Rust:
-safe, fast, productive.
-Pick three.
-Trust me.";
-
-        assert_eq!(
-            vec!["Rust:", "Trust me."],
-            search_case_insensitive(query, contents)
-        );
-    }
 }
