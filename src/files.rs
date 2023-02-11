@@ -1,5 +1,12 @@
-use std::{error::Error, ffi::OsStr, fs, path::Path};
+use std::{
+    env::set_current_dir,
+    error::Error,
+    ffi::OsStr,
+    fs,
+    path::{Path, PathBuf},
+};
 
+use ignore::WalkBuilder;
 use walkdir::WalkDir;
 
 pub fn list_filepaths_with_extension(root_path: &str, extension_pattern: &str) -> Vec<String> {
@@ -16,6 +23,25 @@ pub fn list_filepaths_with_extension(root_path: &str, extension_pattern: &str) -
     }
 
     paths
+}
+
+// [TODO]: This is the one! Test it with test_data
+pub fn get_filtered_filepaths(root_path: &str, extension_pattern: &str) -> Vec<PathBuf> {
+    let working_dir = Path::new("/home/smichaud/Desktop/ts_project");
+    assert!(set_current_dir(&working_dir).is_ok());
+    WalkBuilder::new(root_path)
+        .build()
+        .into_iter()
+        .filter_map(|dir_entry| dir_entry.ok())
+        .filter(|dir_entry| {
+            dir_entry
+                .path()
+                .extension()
+                .map(|ext| ext == extension_pattern)
+                .unwrap_or(false)
+        })
+        .map(|dir_entry| dir_entry.path().to_path_buf())
+        .collect()
 }
 
 pub fn get_extension_from_filename(filename: &str) -> Option<&str> {
