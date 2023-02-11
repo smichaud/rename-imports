@@ -10,6 +10,11 @@ keywords = ["import", "imports", "refactoring", "renaming"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[package.metadata.commands]
+# Requires: `cargo install cargo-cmd cargo-watch`
+# Then run: `cargo cmd watch-test`
+watch-test = "cargo watch -x test"
+
 [dependencies]
 clap = { version = "4.1.1", features = ["derive"] }
 ignore = "0.4.20"

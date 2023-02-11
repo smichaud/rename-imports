@@ -1,22 +1,34 @@
-use std::error::Error;
+use std::{
+    env::{self, set_current_dir},
+    error::Error,
+    ffi::OsStr,
+    path::PathBuf,
+};
 
 pub mod args;
 pub mod files;
 pub mod my_error;
 
-pub fn run(project_root: &str, src: &str, dst: &str) -> Result<(), Box<dyn Error>> {
-    println!("{project_root}: {src} --> {dst}");
+pub fn run(
+    src: PathBuf,
+    dst: PathBuf,
+    project_root: Option<PathBuf>,
+) -> Result<(), Box<dyn Error>> {
+    let project_root = project_root
+        .unwrap_or(env::current_dir().expect("Unable to retrieve current working directory."));
+    set_current_dir(project_root.clone()).expect("Unable to set working directory");
 
-    let extension =
-        files::get_extension_from_filename(src).ok_or(my_error::MyError::new("Broken"))?;
+    let extension = src
+        .extension()
+        .and_then(OsStr::to_str)
+        .expect("Unable to retrieve extension.");
 
-    let filepaths = files::list_filepaths_with_extension(project_root, &extension);
+    let filepaths = files::get_filtered_filepaths(project_root, &extension);
     for filepath in filepaths.iter() {
-        println!("{filepath}");
+        println!("{}", filepath.to_str().unwrap_or(""));
     }
 
-    println!("Get all filepath matching extension pattern");
-    println!("For all files");
+    println!("TODO: For all files");
     println!("If matching rel path, replace and write file");
 
     Ok(())

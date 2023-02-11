@@ -1,5 +1,5 @@
 use clap::ArgAction;
-use clap::Parser;
+pub use clap::Parser;
 
 /// A program to update project imports when a file is renamed
 #[derive(Parser, Debug)]

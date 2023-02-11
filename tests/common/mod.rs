@@ -1,5 +1,29 @@
-use std::{fs, io, path::Path};
-// use tempdir::TempDir;
+use std::{
+    fs, io,
+    path::{Path, PathBuf},
+};
+use tempdir::TempDir;
+
+pub const AN_IGNORED_FILE_RELATIVE_PATH: &str = "src/ignoreme/ignoredMod.ts";
+
+pub struct TestSetupBuilder {
+    temp_dir: TempDir,
+}
+
+impl TestSetupBuilder {
+    pub fn new() -> TestSetupBuilder {
+        let td = TempDir::new("rust_tests").expect("Couldn't create dir.");
+        TestSetupBuilder { temp_dir: td }
+    }
+
+    pub fn set_ts_project(&self) -> PathBuf {
+        let ts_project_dir_path = self.temp_dir.path().join("ts_project");
+        copy_dir_recursive("./tests_data/ts_project", ts_project_dir_path.clone())
+            .expect("Couldn't copy test data.");
+
+        ts_project_dir_path
+    }
+}
 
 pub fn copy_dir_recursive(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
     fs::create_dir_all(&dst)?;
@@ -15,19 +39,4 @@ pub fn copy_dir_recursive(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::R
     }
 
     Ok(())
-}
-
-// pub fn setup_ts_project_dir() -> &Path {
-//     let dir = TempDir::new("rust_tests").expect("Couldn't create dir.");
-//     copy_dir_recursive("./tests_data/ts_project", &dir).expect("Couldn't copy test data.");
-//     dir.path()
-// }
-
-struct SetupBuilder {}
-
-pub fn setup_ts_project_dir() -> PathBuf {
-    let dir = TempDir::new("rust_tests").expect("Couldn't create dir.");
-    common::copy_dir_recursive("./tests_data/ts_project", &dir).expect("Couldn't copy test data.");
-
-    dir.path().to_path_buf()
 }

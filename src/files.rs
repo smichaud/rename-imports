@@ -1,5 +1,4 @@
 use std::{
-    env::set_current_dir,
     error::Error,
     ffi::OsStr,
     fs,
@@ -9,26 +8,8 @@ use std::{
 use ignore::WalkBuilder;
 use walkdir::WalkDir;
 
-pub fn list_filepaths_with_extension(root_path: &str, extension_pattern: &str) -> Vec<String> {
-    let mut paths: Vec<String> = Vec::new();
-    for entry in WalkDir::new(root_path).into_iter().filter_map(|e| e.ok()) {
-        if entry.metadata().unwrap().is_file()
-            && entry
-                .file_name()
-                .to_string_lossy()
-                .ends_with(extension_pattern)
-        {
-            paths.push(entry.path().display().to_string())
-        }
-    }
-
-    paths
-}
-
 // [TODO]: This is the one! Test it with test_data
-pub fn get_filtered_filepaths(root_path: &str, extension_pattern: &str) -> Vec<PathBuf> {
-    let working_dir = Path::new("/home/smichaud/Desktop/ts_project");
-    assert!(set_current_dir(&working_dir).is_ok());
+pub fn get_filtered_filepaths(root_path: PathBuf, extension_pattern: &str) -> Vec<PathBuf> {
     WalkBuilder::new(root_path)
         .build()
         .into_iter()
