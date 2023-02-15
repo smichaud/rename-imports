@@ -25,13 +25,35 @@ pub fn get_filtered_filepaths(root_path: PathBuf, extension_pattern: &str) -> Ve
         .collect()
 }
 
-pub fn get_extension_from_filename(filename: &str) -> Option<&str> {
-    Path::new(filename).extension().and_then(OsStr::to_str)
+// [TODO]: Must remove extension when searching in file and replacing
+pub fn get_updated_content(filepath: PathBuf, src: PathBuf, dst: PathBuf) -> Option<String> {
+    let dirpath = filepath.parent()?;
+    let original_diff = pathdiff::diff_paths(src.clone(), dirpath.clone())?;
+    let original_diff = original_diff.with_extension("");
+
+    let content = fs::read_to_string(filepath.clone()).ok()?;
+    // println!("{content}");
+
+    content.contains(original_diff.with_extension("").to_str()?) == false && return None;
+
+    let refactored_diff = pathdiff::diff_paths(dst.clone(), dirpath)?;
+    let refactored_diff = refactored_diff.with_extension("");
+
+    // println!("======================================");
+    // println!("filepath       {}", filepath.display());
+    // println!("src            {}", src.clone().display());
+    // println!("dst            {}", dst.clone().display());
+    // println!("original_diff: {}", original_diff.clone().display());
+    // println!("refactored_diff: {}", refactored_diff.display());
+    // println!("======================================");
+
+    // [TODO]: Prepend the "./" if does not start with ../
+    // [TODO]: Surround with double quote to prevent subpath replacement
+    Some(content.replace(original_diff.to_str()?, refactored_diff.to_str()?))
 }
 
-pub fn search_imports(filepath: &str) -> Result<(), Box<dyn Error>> {
+pub fn search_imports(filepath: PathBuf) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(filepath)?;
-    println!("{filepath}");
     println!("Contains use? {}", contents.contains("use"));
 
     Ok(())

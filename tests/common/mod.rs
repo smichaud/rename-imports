@@ -4,7 +4,7 @@ use std::{
 };
 use tempdir::TempDir;
 
-pub const AN_IGNORED_FILE_RELATIVE_PATH: &str = "src/ignoreme/ignoredMod.ts";
+// pub const AN_IGNORED_FILE_RELATIVE_PATH: &str = "src/ignoreme/ignoredMod.ts";
 
 pub struct TestSetupBuilder {
     temp_dir: TempDir,

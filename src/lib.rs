@@ -2,6 +2,7 @@ use std::{
     env::{self, set_current_dir},
     error::Error,
     ffi::OsStr,
+    fs::{self, File},
     path::PathBuf,
 };
 
@@ -26,10 +27,17 @@ pub fn run(
     let filepaths = files::get_filtered_filepaths(project_root, &extension);
     for filepath in filepaths.iter() {
         println!("{}", filepath.to_str().unwrap_or(""));
-    }
 
-    println!("TODO: For all files");
-    println!("If matching rel path, replace and write file");
+        match files::get_updated_content(filepath.to_path_buf(), src.clone(), dst.clone()) {
+            Some(updated_content) => {
+                println!("Updating {}", dst.display());
+                fs::write(dst.clone(), updated_content);
+            }
+            None => {
+                println!("Unable to open {}", dst.display());
+            }
+        }
+    }
 
     Ok(())
 }
