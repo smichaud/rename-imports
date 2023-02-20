@@ -20,6 +20,21 @@ fn test_use_git_ignore() {
 }
 
 #[test]
+fn test_given_file_not_renamed_then_rename() {
+    // [TODO]: Hardcode expected string in each file
+}
+
+#[test]
+fn test_given_file_already_renamed_then_does_not_rename() {
+    // [TODO]: Hardcode expected string in each file
+}
+
+#[test]
+fn test_given_file_renaming_fails_then_panic() {
+    // [TODO]: Hardcode expected string in each file
+}
+
+#[test]
 fn test_given_no_project_dir_then_use_current_dir() {
     // [TODO]: Hardcode expected string in each file
 }

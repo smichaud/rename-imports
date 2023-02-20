@@ -1,26 +1,22 @@
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::path::PathBuf;
 
-use rename_imports::{
-    args::{Parser, RenameImportsArgs},
-    files,
-};
+use rename_imports::args::{Parser, RenameImportsArgs};
 
+// [TODO]: Optional project_root, if not provided cwd
+// [TODO]: Detect if file is already renamed, if not apply_rename
+// [TODO]: Multithread that shit
+// [TODO]: Make it work with Python files
+// [TODO]: Have a look at the log crate, could add --verbose and display logging accordingly
 fn main() {
     let args = RenameImportsArgs::parse();
-    if (args.apply_rename) {
-        fs::rename(
-            PathBuf::from(args.src.clone()),
-            PathBuf::from(args.dst.clone()),
-        )
-        .expect("Unable to rename the file")
-    }
+
     rename_imports::run(
         PathBuf::from(args.src),
         PathBuf::from(args.dst),
-        Some(PathBuf::from(args.project_root)),
+        match args.project_root {
+            Some(path_string) => Some(PathBuf::from(path_string)),
+            None => None,
+        },
     )
     .expect("Unable to run the program");
 }

@@ -15,7 +15,7 @@ pub struct RenameImportsArgs {
 
     /// Project root path
     #[arg(value_name = "PROJECT_ROOT", short, long)]
-    pub project_root: String,
+    pub project_root: Option<String>,
 
     /// Whether or not to apply file renaming
     #[arg(short, long, action=ArgAction::SetTrue)]
